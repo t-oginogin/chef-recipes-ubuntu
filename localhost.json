@@ -1,6 +1,7 @@
 {
   "run_list" : [
     "recipe[git]",
-    "recipe[rbenv-ruby]"
+    "recipe[rbenv-ruby]",
+    "recipe[mysql]"
   ]
 }
