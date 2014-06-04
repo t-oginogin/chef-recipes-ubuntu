@@ -2,6 +2,7 @@
   "run_list" : [
     "recipe[git]",
     "recipe[rbenv-ruby]",
-    "recipe[mysql]"
+    "recipe[mysql]",
+    "recipe[redmine]"
   ]
 }
