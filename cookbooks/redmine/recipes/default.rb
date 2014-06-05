@@ -9,7 +9,9 @@
 source_url = node['redmine']['source_url']
 source_dir = node['redmine']['source_dir']
 source_file = node['redmine']['source_file']
+ruby_version = node['redmine']['ruby_version']
 db_password = node['redmine']['db_password']
+port = node['redmine']['port']
 
 remote_file "/home/vagrant/#{source_file}" do
   not_if "test -e #{source_file}"
@@ -31,9 +33,9 @@ bash 'set ruby 2.0.0' do
   code <<-EOL
     cd /var/www/#{source_dir}
     source ~/.bash_profile
-    if ! rbenv version | grep 2.0.0-p481; then
-      rbenv install 2.0.0-p481
-      rbenv local 2.0.0-p481
+    if ! rbenv version | grep #{ruby_version}; then
+      rbenv install #{ruby_version}
+      rbenv local #{ruby_version}
       rbenv rehash
     fi
   EOL
@@ -91,5 +93,60 @@ bash 'prepare startup' do
     sudo chown -R vagrant:vagrant files log tmp public/plugin_assets
     sudo chmod -R 755 files log tmp public/plugin_assets
   EOL
+end
+
+bash 'set unicorn' do
+  user 'vagrant'
+  code <<-EOL
+    if ! grep unicorn /var/www/redmine-2.5.1/Gemfile; then
+      cd /var/www/#{source_dir}
+      source ~/.bash_profile
+      echo "\ngem 'unicorn'" >> /var/www/#{source_dir}/Gemfile
+      bundle install --without development test
+      rbenv rehash
+    fi
+  EOL
+end
+
+bash 'create unicorn dir' do
+  user 'root'
+  not_if 'test -e /etc/unicorn'
+  code <<-EOL
+    mkdir -p /etc/unicorn
+  EOL
+end
+
+template "/var/www/#{source_dir}/config/unicorn.rb" do
+  user 'vagrant'
+  source 'unicorn.rb.erb'
+
+  variables ({
+    :port => "#{port}"
+  })
+end
+
+template "/etc/unicorn/redmine.conf" do
+  user 'root'
+  source 'redmine.conf.erb'
+
+  variables ({
+    :source_dir => "#{source_dir}",
+    :ruby_version => "#{ruby_version}"
+  })
+end
+
+template "/etc/init.d/redmine" do
+  user 'root'
+  mode 655
+  source 'redmine_initd.erb'
+
+  variables ({
+    :source_dir => "#{source_dir}",
+    :ruby_version => "#{ruby_version}"
+  })
+end
+
+service 'redmine' do
+  action [:start, :enable]
 end
 
