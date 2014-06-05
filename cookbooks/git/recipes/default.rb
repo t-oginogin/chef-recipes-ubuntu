@@ -14,6 +14,8 @@ end
 bash "add alias" do
   user 'vagrant'
 
+  not_if 'grep log ~/.gitconfig'
+
   code <<-EOL
     echo '[alias]' >> ~/.gitconfig
     echo "  tr = log --graph --pretty='format:%C(yellow)%h%Creset %s %Cgreen(%an)%Creset %Cred%d%Creset'" >> ~/.gitconfig
