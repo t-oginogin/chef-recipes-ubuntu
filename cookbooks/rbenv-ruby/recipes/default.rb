@@ -11,7 +11,7 @@ ruby_version = node['rbenv']['ruby_version']
 
 bash 'install rbenv' do
   user 'vagrant'
-  not_if 'which rbenv'
+  not_if 'test -e ~/.rbenv'
   code <<-EOL
     git clone https://github.com/sstephenson/rbenv.git $HOME/.rbenv
     echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> $HOME/.bash_profile
