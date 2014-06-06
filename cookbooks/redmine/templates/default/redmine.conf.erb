@@ -1,4 +1,4 @@
-export PATH="/home/vagrant/.rbenv/bin:$PATH"
+export PATH="/home/<%= @user %>/.rbenv/bin:$PATH"
 RAILS_ENV=production
 RAILS_ROOT=/var/www/<%= @source_dir %>
-UNICORN="/home/vagrant/.rbenv/versions/<%= @ruby_version %>/bin/unicorn"
+UNICORN="/home/<%= @user %>/.rbenv/versions/<%= @ruby_version %>/bin/unicorn"

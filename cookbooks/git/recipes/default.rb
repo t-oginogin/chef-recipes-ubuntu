@@ -7,12 +7,14 @@
 # All rights reserved - Do Not Redistribute
 #
 
+git_user = node['git']['user']
+
 package "git" do
   action :install
 end
 
 bash "add alias" do
-  user 'vagrant'
+  user "#{git_user}"
 
   not_if 'grep log ~/.gitconfig'
 

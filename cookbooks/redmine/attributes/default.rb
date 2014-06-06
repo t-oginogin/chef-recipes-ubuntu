@@ -1,3 +1,4 @@
+default['redmine']['user'] = 'vagrant'
 default['redmine']['packages'] = %w[imagemagick libmagick++-dev libmysqld-dev sysv-rc-conf]
 default['redmine']['source_url'] = 'http://www.redmine.org/releases'
 default['redmine']['source_dir'] = 'redmine-2.5.1'

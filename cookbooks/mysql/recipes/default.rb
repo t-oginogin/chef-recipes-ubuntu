@@ -9,6 +9,7 @@
 
 install_dir = '/usr/local/src'
 
+mysql_user = node['mysql']['user']
 mysql_version = node['mysql']['version']
 mysql_password = node['mysql']['password']
 

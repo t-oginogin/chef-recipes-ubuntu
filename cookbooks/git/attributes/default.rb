@@ -1,0 +1,1 @@
+default['git']['user'] = 'vagrant'

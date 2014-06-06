@@ -6,6 +6,7 @@
 #
 # All rights reserved - Do Not Redistribute
 
+redmine_user = node['redmine']['user']
 source_url = node['redmine']['source_url']
 source_dir = node['redmine']['source_dir']
 source_file = node['redmine']['source_file']
@@ -13,7 +14,7 @@ ruby_version = node['redmine']['ruby_version']
 db_password = node['redmine']['db_password']
 port = node['redmine']['port']
 
-remote_file "/home/vagrant/#{source_file}" do
+remote_file "/home/#{redmine_user}/#{source_file}" do
   not_if "test -e #{source_file}"
   source "#{source_url}/#{source_file}"
 end
@@ -22,14 +23,14 @@ bash 'deploy redmine' do
   code <<-EOL
     not_if "test -e /var/www/#{source_dir}"
     sudo mkdir /var/www/
-    mv /home/vagrant/#{source_file} /var/www/
+    mv /home/#{redmine_user}/#{source_file} /var/www/
     cd /var/www/
     tar xvzf #{source_file}
   EOL
 end
 
 bash 'set ruby 2.0.0' do
-  user 'vagrant'
+  user "#{redmine_user}"
   code <<-EOL
     cd /var/www/#{source_dir}
     source ~/.bash_profile
@@ -48,7 +49,7 @@ node['redmine']['packages'].each do |package|
 end
 
 template "/var/www/#{source_dir}/config/database.yml" do
-  user 'vagrant'
+  user "#{redmine_user}"
   source 'database.yml.erb'
   
   variables ({
@@ -57,7 +58,7 @@ template "/var/www/#{source_dir}/config/database.yml" do
 end
 
 bash 'install gems' do
-  user 'vagrant'
+  user "#{redmine_user}"
   code <<-EOL
     cd /var/www/#{source_dir}
     source ~/.bash_profile
@@ -82,7 +83,7 @@ bash 'initialize db for application' do
 end
 
 bash 'prepare startup' do
-  user 'vagrant'
+  user "#{redmine_user}"
   code <<-EOL
     cd /var/www/#{source_dir}
     source ~/.bash_profile
@@ -90,13 +91,13 @@ bash 'prepare startup' do
     bundle exec rake db:migrate RAILS_ENV=production
     bundle exec rake redmine:load_default_data REDMINE_LANG=ja RAILS_ENV=production
     mkdir -p tmp tmp/pdf public/plugin_assets
-    sudo chown -R vagrant:vagrant files log tmp public/plugin_assets
+    sudo chown -R #{redmine_user}:#{redmine_user} files log tmp public/plugin_assets
     sudo chmod -R 755 files log tmp public/plugin_assets
   EOL
 end
 
 bash 'set unicorn' do
-  user 'vagrant'
+  user "#{redmine_user}"
   code <<-EOL
     if ! grep unicorn /var/www/redmine-2.5.1/Gemfile; then
       cd /var/www/#{source_dir}
@@ -109,7 +110,7 @@ bash 'set unicorn' do
 end
 
 bash 'create unicorn dir' do
-  user 'root'
+  user "#{redmine_user}"
   not_if 'test -e /etc/unicorn'
   code <<-EOL
     mkdir -p /etc/unicorn
@@ -117,7 +118,7 @@ bash 'create unicorn dir' do
 end
 
 template "/var/www/#{source_dir}/config/unicorn.rb" do
-  user 'vagrant'
+  user "#{redmine_user}"
   source 'unicorn.rb.erb'
 
   variables ({
@@ -130,6 +131,7 @@ template "/etc/unicorn/redmine.conf" do
   source 'redmine.conf.erb'
 
   variables ({
+    :user => "#{redmine_user}",
     :source_dir => "#{source_dir}",
     :ruby_version => "#{ruby_version}"
   })
