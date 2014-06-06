@@ -90,7 +90,7 @@ bash 'prepare startup' do
     bundle exec rake generate_secret_token
     bundle exec rake db:migrate RAILS_ENV=production
     bundle exec rake redmine:load_default_data REDMINE_LANG=ja RAILS_ENV=production
-    mkdir -p tmp tmp/pdf public/plugin_assets
+    mkdir -p tmp tmp/pdf tmp/pids public/plugin_assets
     sudo chown -R #{redmine_user}:#{redmine_user} files log tmp public/plugin_assets
     sudo chmod -R 755 files log tmp public/plugin_assets
   EOL
