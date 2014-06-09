@@ -4,6 +4,7 @@
     "recipe[git]",
     "recipe[rbenv-ruby]",
     "recipe[mysql]",
+    "recipe[nginx]",
     "recipe[redmine]",
     "recipe[redmine_backlogs]"
   ]

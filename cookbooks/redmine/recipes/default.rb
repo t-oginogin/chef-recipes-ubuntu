@@ -65,7 +65,8 @@ bash 'install gems' do
     rbenv local 2.0.0-p481
     rbenv rehash
     gem install bundler
-    gem install mysql2
+    gem uninstall mysql2
+    gem install mysql2 --platform=ruby
     bundle install --without development test
     rbenv rehash
   EOL
@@ -149,6 +150,26 @@ template "/etc/init.d/redmine" do
 end
 
 service 'redmine' do
-  action [:start, :enable]
+  action [:restart, :enable]
 end
 
+template "/etc/nginx/sites-available/redmine.conf" do
+  user 'root'
+  source 'redmine_nginx.conf.erb'
+
+  variables ({
+    :source_dir => "#{source_dir}",
+  })
+end
+
+bash 'set_conf'  do
+  user 'root'
+  not_if 'test -e /etc/nginx/sites-enabled/redmine.conf'
+  code <<-EOL
+    ln -s /etc/nginx/sites-available/redmine.conf /etc/nginx/sites-enabled/redmine.conf
+  EOL
+end
+
+service 'nginx' do
+  action [:restart, :enable]
+end
