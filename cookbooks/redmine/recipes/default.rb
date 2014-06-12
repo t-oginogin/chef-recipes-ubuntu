@@ -114,7 +114,7 @@ bash 'create unicorn dir' do
   user "#{redmine_user}"
   not_if 'test -e /etc/unicorn'
   code <<-EOL
-    mkdir -p /etc/unicorn
+    sudo mkdir -p /etc/unicorn
   EOL
 end
 
