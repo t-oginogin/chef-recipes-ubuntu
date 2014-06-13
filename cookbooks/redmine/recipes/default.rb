@@ -65,8 +65,11 @@ bash 'install gems' do
     rbenv local 2.0.0-p481
     rbenv rehash
     gem install bundler
+    rbenv rehash
     gem uninstall mysql2
+    rbenv rehash
     gem install mysql2 --platform=ruby
+    rbenv rehash
     bundle install --without development test
     rbenv rehash
   EOL
