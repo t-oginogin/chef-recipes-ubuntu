@@ -29,7 +29,7 @@ bash 'deploy redmine' do
   EOL
 end
 
-bash 'set ruby 2.0.0' do
+bash "set ruby #{ruby_version}" do
   user "#{redmine_user}"
   code <<-EOL
     cd /var/www/#{source_dir}
@@ -62,7 +62,7 @@ bash 'install gems' do
   code <<-EOL
     cd /var/www/#{source_dir}
     source ~/.bash_profile
-    rbenv local 2.0.0-p481
+    rbenv local #{ruby_version}
     rbenv rehash
     gem install bundler
     rbenv rehash
